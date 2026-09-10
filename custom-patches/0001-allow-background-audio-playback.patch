@@ -1,13 +1,14 @@
-From 2b112b2b2767d7a0584fb8155a96b306f8d9e45c Mon Sep 17 00:00:00 2001
+From 045dc6ab27654d1fd77207e08604dbde73a2c912 Mon Sep 17 00:00:00 2001
 From: Your Name <you@example.com>
-Date: Tue, 8 Sep 2026 20:44:09 +0800
-Subject: [PATCH 1/3] allow background audio playback
+Date: Thu, 10 Sep 2026 23:10:27 +0800
+Subject: [PATCH 1/2] Allow playing audio in background
 
+Co-authored-by: AlexeyBarabash <alexey@brave.com>
 ---
  .../render_frame_media_playback_options.cc         |  1 +
  .../platform/media/web_media_player_impl.cc        | 14 +++++++++++++-
- .../platform/media/web_media_player_impl.h         |  4 ++++
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ .../platform/media/web_media_player_impl.h         |  3 +++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/content/public/renderer/render_frame_media_playback_options.cc b/content/public/renderer/render_frame_media_playback_options.cc
 index 5074b48ec9d15..307b12497b1e5 100644
@@ -22,14 +23,14 @@ index 5074b48ec9d15..307b12497b1e5 100644
    // For Android devices, do not suspend background media for devices with large
    // displays. Exception is for Webview.
 diff --git a/third_party/blink/renderer/platform/media/web_media_player_impl.cc b/third_party/blink/renderer/platform/media/web_media_player_impl.cc
-index aeca590a1b66d..e7ae3953f24de 100644
+index 839bcbcfe76c3..e025c32f3f38e 100644
 --- a/third_party/blink/renderer/platform/media/web_media_player_impl.cc
 +++ b/third_party/blink/renderer/platform/media/web_media_player_impl.cc
-@@ -1345,6 +1345,15 @@ bool WebMediaPlayerImpl::HasAudio() const {
-   return pipeline_metadata_.has_audio;
+@@ -1351,6 +1351,15 @@ bool WebMediaPlayerImpl::IsHDR() const {
+   return pipeline_metadata_.video_decoder_config.color_space_info().IsHDR();
  }
  
-+ 
++
 +bool WebMediaPlayerImpl::HasVideoNonEmptySize() const {
 +  DCHECK(main_task_runner_->BelongsToCurrentThread());
 +
@@ -41,9 +42,9 @@ index aeca590a1b66d..e7ae3953f24de 100644
  void WebMediaPlayerImpl::EnabledAudioTracksChanged(
      std::optional<WebMediaPlayer::TrackId> enabled_track_id) {
    DCHECK(main_task_runner_->BelongsToCurrentThread());
-@@ -3765,7 +3774,10 @@ bool WebMediaPlayerImpl::ShouldPausePlaybackWhenHidden() const {
+@@ -3774,7 +3783,10 @@ bool WebMediaPlayerImpl::ShouldPausePlaybackWhenHidden() const {
+       audio_source_provider_->IsAudioBeingCaptured();
  
-   const bool preserve_audio = HasUnmutedAudio() || audio_source_provider_->IsAudioBeingCaptured();
    // Audio only stream is allowed to play when in background.
 -  if (!HasVideo() && preserve_audio)
 +  //pipeline_metadata_.has_video is true for MediaPlayerRenderer,
@@ -54,20 +55,19 @@ index aeca590a1b66d..e7ae3953f24de 100644
  
    // Video PiP is the only exception when background video playback is disabled.
 diff --git a/third_party/blink/renderer/platform/media/web_media_player_impl.h b/third_party/blink/renderer/platform/media/web_media_player_impl.h
-index 431d4eebdfbec..cd07705e5b473 100644
+index a7b5e4a39bb59..8bd477a8aa8ae 100644
 --- a/third_party/blink/renderer/platform/media/web_media_player_impl.h
 +++ b/third_party/blink/renderer/platform/media/web_media_player_impl.h
-@@ -211,6 +211,10 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
-   // True if the loaded media has a playable video/audio track.
-   bool HasVideo() const override;
-   bool HasAudio() const override;
-+
+@@ -214,6 +214,9 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
+   bool IsHDR() const override;
+   bool IsVideoBeingCaptured() const override;
+ 
 +  // True is has video and it's frame size is not zero
 +  bool HasVideoNonEmptySize() const;
 +
-   bool IsVideoBeingCaptured() const override;
- 
    void EnabledAudioTracksChanged(
+       std::optional<WebMediaPlayer::TrackId> enabled_track_id) override;
+   void SelectedVideoTrackChanged(
 -- 
 2.55.0
 
