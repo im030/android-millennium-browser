@@ -1,7 +1,8 @@
-chrome_public_manifest_package = "io.github.jqssun.helium"
+chrome_public_manifest_package = "moe.hx030.chromium"
+trichrome_certdigest="10f908c76ee29de227c0073f6c6e4bcde728b5d485047df71b7147df54020012"
 is_desktop_android = true
 target_os = "android"
-target_cpu = "arm"
+target_cpu = "arm64"
 is_component_build = false
 is_debug = false
 is_official_build = true
@@ -36,3 +37,34 @@ include_both_v8_snapshots_android_secondary_abi = false
 v8_enable_drumbrake = true
 v8_drumbrake_bounds_checks = true 
 generate_linker_map = true
+
+
+android_static_analysis = "off"
+
+enable_stripping=true
+strip_debug_info=true
+enable_resource_allowlist_generation=false
+optimize_for_size=true
+
+v8_symbol_level=0
+use_thin_lto=true
+thin_lto_enable_optimizations=true
+enable_pdf=false
+enable_rlz=false
+
+
+android_channel="stable"
+blink_symbol_level=0
+chrome_pgo_phase=2
+debuggable_apks=false
+disable_android_lint=true
+enable_hangout_services_extension=false
+enable_mdns=false
+enable_mse_mpeg2ts_stream_parser=true
+enable_platform_dolby_vision=true
+enable_platform_hevc=true
+is_cfi=false
+treat_warnings_as_errors=false
+use_debug_fission=false
+use_official_google_api_keys=false
+use_stable_package_name_for_trichrome=false

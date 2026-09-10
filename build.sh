@@ -18,36 +18,47 @@ git checkout $VERSION
 cp $SCRIPT_DIR/.gclient ../.gclient
 
 # https://grapheneos.org/build#browser-and-webview
-rm -rf $SCRIPT_DIR/vanadium/patches/*trichrome-{apk-build-targets,browser-apk-targets}.patch
-rm -rf $SCRIPT_DIR/vanadium/patches/*{detailed,supported}-language*.patch
+rm -rf $SCRIPT_DIR/vanadium/patches/*trichrome-apk-build-targets.patch
 rm -rf $SCRIPT_DIR/vanadium/patches/*javascript-optimizer-{site-setting,settings-UI}.patch
-rm -rf $SCRIPT_DIR/vanadium/patches/*component-updates.patch
-rm -rf $SCRIPT_DIR/vanadium/patches/*{pdf,PDF,for-content-public,toolbar-button,configs-from-config-app,new-tab-card,predictive-back*}*.patch
+# rm -rf $SCRIPT_DIR/vanadium/patches/*component-updates.patch # check if this actually needs to be removed
+# rm -rf $SCRIPT_DIR/vanadium/patches/*{pdf,PDF,for-content-public,toolbar-button,configs-from-config-app,new-tab-card,predictive-back*}*.patch
 # rm -rf $SCRIPT_DIR/vanadium/patches/*crashpad*.patch
-replace "$SCRIPT_DIR/vanadium/patches" "VANADIUM" "TITANIUM"
-replace "$SCRIPT_DIR/vanadium/patches" "Vanadium" "Titanium"
-replace "$SCRIPT_DIR/vanadium/patches" "vanadium" "titanium"
+replace "$SCRIPT_DIR/vanadium/patches" "VANADIUM" "MILLENNIUM"
+replace "$SCRIPT_DIR/vanadium/patches" "Vanadium" "Millennium"
+replace "$SCRIPT_DIR/vanadium/patches" "vanadium" "millennium"
 git am --whitespace=nowarn --keep-non-patch $SCRIPT_DIR/vanadium/patches/*.patch
+
+function apply() {
+    git am --whitespace=nowarn --keep-non-patch "$1" || (
+        patch -p1 < "$1" || { git add .; git reset --hard; return 1; }
+        git add .
+        git commit -m "$(echo "$1" | sed 's|.*/||g')"
+    )
+}
+apply "$SCRIPT_DIR/custom-patches/0001-allow-background-audio-playback.patch"
+apply "$SCRIPT_DIR/custom-patches/0002-bromite-Share-Intent.patch"
+
+
 
 gclient sync -D --no-history --nohooks
 gclient runhooks
 ./build/install-build-deps.sh --no-prompt
 
 source $SCRIPT_DIR/patch.sh
+
 cp $SCRIPT_DIR/args.gn out/Default/args.gn
 gn gen out/Default # gn args out/Default; echo 'treat_warnings_as_errors = false' >> out/Default/args.gn
 mkdir -p out/tmp out/release
 
-autoninja -C out/Default chrome_public_apk
-mv $(find out/Default/apks -name 'Chrome*.apk') out/tmp/$VERSION-armeabi-v7a.apk
-sed -i 's/target_cpu = "arm"/target_cpu = "arm64"/' out/Default/args.gn
-autoninja -C out/Default chrome_public_apk chrome_public_bundle
-mv $(find out/Default/apks -name 'Chrome*.apk') out/tmp/$VERSION-arm64-v8a.apk
-mv $(find out/Default/apks -name 'Chrome*.aab') out/tmp/$VERSION-arm64-v8a.aab
-
+autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_apk trichrome_webview_64_apk system_webview_shell_apk
 export PATH=$PWD/third_party/jdk/current/bin/:$PATH
-export ANDROID_HOME=$PWD/third_party/android_sdk/public
-sign_apk out/tmp/$VERSION-armeabi-v7a.apk out/release/$VERSION-armeabi-v7a.apk
-sign_apk out/tmp/$VERSION-arm64-v8a.apk out/release/$VERSION-arm64-v8a.apk
-sign_aab out/tmp/$VERSION-arm64-v8a.aab out/release/$VERSION-arm64-v8a.aab
+mv "$(find out/Default/apks -name 'TrichromeLibrary64.apk')" out/release/TrichromeLibrary-$VERSION-arm64-v8a.apk
+mv "$(find out/Default/apks -name 'TrichromeWebview64.apk')" out/release/TrichromeWebview-$VERSION-arm64-v8a.apk
+java -jar "../../..//third_party/android_build_tools/bundletool/cipd/bundletool.jar" build-apks --mode universal --bundle TrichromeChrome64.aab --output . --output-format DIRECTORY
+mv "$(find out/Default/apks -name 'universal.apk')" out/release/TrichromeBrowser-$VERSION-arm64-v8a.apk
+
+# TODO: fix sign apk
+# export ANDROID_HOME=$PWD/third_party/android_sdk/public
+# sign_apk out/tmp/$VERSION-arm64-v8a.apk out/release/$VERSION-arm64-v8a.apk
+# sign_aab out/tmp/$VERSION-arm64-v8a.aab out/release/$VERSION-arm64-v8a.aab
 rm -rf $SCRIPT_DIR/keys
