@@ -54,8 +54,8 @@ autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_ap
 export PATH=$PWD/third_party/jdk/current/bin/:$PATH
 mv "$(find out/Default/apks -name 'TrichromeLibrary64.apk')" out/release/TrichromeLibrary-$VERSION-arm64-v8a.apk
 mv "$(find out/Default/apks -name 'TrichromeWebview64.apk')" out/release/TrichromeWebview-$VERSION-arm64-v8a.apk
-java -jar "../../..//third_party/android_build_tools/bundletool/cipd/bundletool.jar" build-apks --mode universal --bundle TrichromeChrome64.aab --output . --output-format DIRECTORY
-mv "$(find out/Default/apks -name 'universal.apk')" out/release/TrichromeBrowser-$VERSION-arm64-v8a.apk
+java -jar "third_party/android_build_tools/bundletool/cipd/bundletool.jar" build-apks --mode universal --bundle out/Default/TrichromeChrome64.aab --output out/tmp/ --output-format DIRECTORY
+mv out/tmp/universal.apk out/release/TrichromeBrowser-$VERSION-arm64-v8a.apk
 
 # TODO: fix sign apk
 # export ANDROID_HOME=$PWD/third_party/android_sdk/public
