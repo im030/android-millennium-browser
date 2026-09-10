@@ -55,8 +55,9 @@ jobs:
         run: |
           export VERSION=$(find chromium/src/out/release -name '*arm64-v8a.apk' | sed 's/.*\///;s/\-arm64-v8a.apk$//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          mv $(find chromium/src/out/release -name '*arm64-v8a.aab') $VERSION-${{ env.unix_time }}-arm64-v8a.aab
-          mv $(find chromium/src/out/release -name '*arm64-v8a.apk') $VERSION-${{ env.unix_time }}-arm64-v8a.apk
+          mv $(find chromium/src/out/release -name 'TrichromeBrowser*arm64-v8a.apk') TrichromeBrowser-$VERSION-${{ env.unix_time }}-arm64-v8a.apk
+          mv $(find chromium/src/out/release -name 'TrichromeWebview*arm64-v8a.apk') TrichromeWebview-$VERSION-${{ env.unix_time }}-arm64-v8a.apk
+          mv $(find chromium/src/out/release -name 'TrichromeLibrary*arm64-v8a.apk') TrichromeLibrary-$VERSION-${{ env.unix_time }}-arm64-v8a.apk
 
       - name: Publish
         uses: softprops/action-gh-release@v2
@@ -65,12 +66,14 @@ jobs:
           name: v${{ env.VERSION }}
           tag_name: v${{ env.VERSION }}
           files: |
-            ${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.aab
-            ${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeBrowser-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeWebview-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeLibrary-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
 
       - name: Attest
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
-            ${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.aab
-            ${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeBrowser-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeWebview-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
+            TrichromeLibrary-${{ env.VERSION }}-${{ env.unix_time }}-arm64-v8a.apk
