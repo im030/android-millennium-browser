@@ -53,6 +53,11 @@ gclient runhooks
 
 source $SCRIPT_DIR/patch.sh
 
+if [ ! -f v8/tools/builtins-pgo/profiles/x64.profile ]; then
+    find v8 -name "x64.profile" || true
+    python3 tools/builtins-pgo/download_profiles.py download --check-v8-revision
+fi
+
 if [ ! -f build/util/LASTCHANGE ]; then
     python3 build/util/lastchange.py -o build/util/LASTCHANGE
 fi
