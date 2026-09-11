@@ -38,7 +38,7 @@ function apply() {
     )
 }
 apply "$SCRIPT_DIR/custom-patches/0001-allow-background-audio-playback.patch"
-apply "$SCRIPT_DIR/custom-patches/0002-bromite-Share-Intent.patch"
+# apply "$SCRIPT_DIR/custom-patches/0002-bromite-Share-Intent.patch"
 
 
 
@@ -56,8 +56,11 @@ if [ ! -f build/util/LASTCHANGE.committime ]; then
     date -u +%s > build/util/LASTCHANGE.committime
 fi
 
-cp $SCRIPT_DIR/args.gn out/Default/args.gn
-gn gen out/Default # gn args out/Default; echo 'treat_warnings_as_errors = false' >> out/Default/args.gn
+# cp $SCRIPT_DIR/args.gn out/Default/args.gn
+# gn gen out/Default # gn args out/Default; echo 'treat_warnings_as_errors = false' >> out/Default/args.gn
+
+gn gen --args="$(cat $SCRIPT_DIR/args.gn)" out/Default
+
 mkdir -p out/tmp out/release
 
 autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_apk trichrome_webview_64_apk system_webview_shell_apk
