@@ -48,6 +48,10 @@ gclient runhooks
 
 source $SCRIPT_DIR/patch.sh
 
+if [ ! -f build/util/LASTCHANGE ]; then
+    python3 build/util/lastchange.py -o build/util/LASTCHANGE
+fi
+
 if [ ! -f build/util/LASTCHANGE.committime ]; then
     date -u +%s > build/util/LASTCHANGE.committime
 fi
