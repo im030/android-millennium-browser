@@ -15,7 +15,12 @@ export PATH="$PWD/depot_tools:$PATH"
 mkdir -p chromium/src/out/Default; cd chromium/src
 git init
 git remote add origin $CHROMIUM_SOURCE
-git fetch --depth 1 $CHROMIUM_SOURCE +refs/tags/$VERSION:chromium_$VERSION
+
+for ((i = 0 ; i <= 30 ; i++)); do
+    if git fetch --depth 1 $CHROMIUM_SOURCE +refs/tags/$VERSION:chromium_$VERSION; then
+        break
+    fi
+done
 git checkout $VERSION
 cp $SCRIPT_DIR/.gclient ../.gclient
 
