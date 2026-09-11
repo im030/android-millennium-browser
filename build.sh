@@ -47,6 +47,7 @@ apply "$SCRIPT_DIR/custom-patches/0001-allow-background-audio-playback.patch"
 
 
 
+mkdir -p $SCRIPT_DIR/chromium/src/millennium/android_config/filter_lists
 gclient sync -D --no-history --nohooks
 gclient runhooks --verbose
 ./build/install-build-deps.sh --no-prompt
@@ -75,7 +76,7 @@ mkdir -p out/tmp out/release
 
 cat DEPS
 
-autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_apk trichrome_webview_64_apk system_webview_shell_apk
+autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_apk trichrome_webview_64_apk system_webview_shell_apk || exit 1
 export PATH=$PWD/third_party/jdk/current/bin/:$PATH
 mv "$(find out/Default/apks -name 'TrichromeLibrary64.apk')" out/release/TrichromeLibrary-$VERSION-arm64-v8a.apk
 mv "$(find out/Default/apks -name 'TrichromeWebview64.apk')" out/release/TrichromeWebview-$VERSION-arm64-v8a.apk
