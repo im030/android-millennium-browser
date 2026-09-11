@@ -48,7 +48,7 @@ apply "$SCRIPT_DIR/custom-patches/0001-allow-background-audio-playback.patch"
 
 
 gclient sync -D --no-history --nohooks
-gclient runhooks
+gclient runhooks --verbose
 ./build/install-build-deps.sh --no-prompt
 
 source $SCRIPT_DIR/patch.sh
@@ -72,6 +72,8 @@ fi
 gn gen --args="$(cat $SCRIPT_DIR/args.gn)" out/Default
 
 mkdir -p out/tmp out/release
+
+cat DEPS
 
 autoninja -C out/Default trichrome_chrome_64_bundle_apks trichrome_library_64_apk trichrome_webview_64_apk system_webview_shell_apk
 export PATH=$PWD/third_party/jdk/current/bin/:$PATH
